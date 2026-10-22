@@ -46,6 +46,7 @@
       const row=el('div','equipment-row');row.append(el('strong','',unit.name+(unit.role==='carry'?' · 主 C':'')),el('span','',unit.items.join(' / ')));equip.append(row);
     }
     if(!equip.children.length)equip.append(el('p','catalog-disclaimer','该攻略未标注装备，请查看官网详情。'));
+    window.dispatchEvent(new CustomEvent('jcc-comp-detail',{detail:comp}));
     $('comp-dialog').showModal();
   }
   function render() {
@@ -77,7 +78,7 @@
       if(!response.ok)throw new Error('Feed unavailable');
       const raw=await response.json();const next=convert(raw.lineup_list,data.heroes,data.items);
       if(next.length<3)throw new Error('Incomplete feed');
-      comps=next;render();status('已同步官网 · '+new Date().toLocaleString('zh-CN',{timeZone:'Asia/Shanghai',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hour12:false}));
+      comps=next;window.dispatchEvent(new CustomEvent('jcc-catalog-ready',{detail:comps}));render();status('已同步官网 · '+new Date().toLocaleString('zh-CN',{timeZone:'Asia/Shanghai',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hour12:false}));
     } catch (_) { status('官网暂未连通，显示 '+data.checkedAt+' 收录内容'); }
     finally {clearTimeout(timeout);button.disabled=false;button.textContent='刷新阵容 ↻';}
   }
@@ -90,5 +91,7 @@
     $('comp-dialog').close();window.dispatchEvent(new CustomEvent('jcc-recommendation',{detail:{lineup,share}}));
   }
   $('share-recommendation').addEventListener('click',()=>use(true));$('edit-recommendation').addEventListener('click',()=>use(false));
+  window.addEventListener('jcc-show-comp',event=>{const comp=comps.find(c=>c.id===event.detail);if(comp)show(comp);});
+  window.dispatchEvent(new CustomEvent('jcc-catalog-ready',{detail:comps}));
   render();status('已收录 '+data.checkedAt+' 官网内容');refresh();
 })();

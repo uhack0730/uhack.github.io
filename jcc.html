@@ -11,10 +11,12 @@ permalink: /jcc/
   <meta name="theme-color" content="#11191b">
   <meta name="description" content="自动读取金铲铲官网阵容攻略，查看棋子、装备与站位，分享给好友。">
   <title>金铲铲阵容分享 · Uhack</title>
-  <link rel="stylesheet" href="{{ '/css/jcc.css?v=2' | prepend: site.baseurl }}">
+  <link rel="stylesheet" href="{{ '/css/jcc.css?v=artifacts1' | prepend: site.baseurl }}">
   <script src="{{ '/js/jcc.js?v=2' | prepend: site.baseurl }}" defer></script>
   <script src="{{ '/js/jcc-data.js' | prepend: site.baseurl }}" defer></script>
-  <script src="{{ '/js/jcc-catalog.js' | prepend: site.baseurl }}" defer></script>
+  <script src="{{ '/js/jcc-artifact-data.js' | prepend: site.baseurl }}" defer></script>
+  <script src="{{ '/js/jcc-artifacts.js' | prepend: site.baseurl }}" defer></script>
+  <script src="{{ '/js/jcc-catalog.js?v=artifacts1' | prepend: site.baseurl }}" defer></script>
 </head>
 <body>
   <header class="topbar">
@@ -28,6 +30,22 @@ permalink: /jcc/
       <button class="button secondary" id="toggle-editor" aria-expanded="false">我的阵容 / 编辑</button>
     </section>
 
+    <div class="mode-switch" role="group" aria-label="选择找阵容的方式"><button id="mode-catalog" class="active" aria-pressed="true" aria-controls="recommendations">阵容推荐</button><button id="mode-artifacts" aria-pressed="false" aria-controls="artifact-section">◇ 神器定阵</button></div>
+    <section id="artifact-section" aria-labelledby="artifact-heading" hidden>
+      <div class="artifact-intro"><div><p class="eyebrow">BUILD AROUND YOUR ARTIFACT</p><h2 id="artifact-heading">拿到什么神器？</h2><p>选神器，找阵容，再看给谁带。</p></div><span class="artifact-version">机制资料 18.5 · 10 月 22 日整理</span></div>
+      <div class="artifact-picker panel">
+        <div class="artifact-picker-heading"><label><span class="sr-only">搜索神器</span><input id="artifact-search" type="search" placeholder="搜神器名称，也支持「火炮」「烁刃」…"></label><span>最多选择 3 件不同神器</span></div>
+        <div id="artifact-categories" class="catalog-filters" aria-label="神器类型"></div>
+        <div id="artifact-options" class="artifact-options" role="group" aria-label="选择神器"></div>
+        <div class="artifact-selected-row"><div id="artifact-selected"></div><button id="clear-artifacts" class="text-button" hidden>清空选择</button></div>
+        <p id="artifact-feedback" class="artifact-feedback" role="status"></p>
+      </div>
+      <p class="artifact-method">按装备与弈子机制整理，未经过胜率统计验证。优先展示已选神器都有携带者的阵容；攻略版本以卡片为准。</p>
+      <div id="artifact-summary" class="artifact-summary" role="status"></div>
+      <div id="artifact-results" class="artifact-results"></div><button id="more-artifacts" class="button secondary more-button" hidden>查看更多搭配</button>
+      <div class="artifact-share" hidden id="artifact-share-panel"><button id="share-artifacts" class="button secondary">复制神器选择链接 ↗</button><label class="field" id="artifact-link-field" hidden>复制此链接<input id="artifact-link" readonly></label><p id="artifact-share-feedback" role="status"></p></div>
+      <p class="catalog-credit">机制依据：<a href="https://jcc.qq.com/" target="_blank" rel="noopener">金铲铲之战官网 ↗</a> · 搭配说明由本站整理。神器不是强行转阵的理由，还要看装备、来牌和经济。</p>
+    </section>
     <section id="recommendations" aria-labelledby="recommendation-heading">
       <div class="patch-note"><div><strong>自然之力</strong><span>10 月 22 日 · 18.5 更新</span><p>崔丝塔娜、墨菲特增强，拉露恩调整。攻略版本见各阵容卡片。</p></div><a href="https://www.taptap.cn/moment/862042074755629446" target="_blank" rel="noopener">官方更新公告 ↗</a></div>
       <div class="catalog-heading"><div><h2 id="recommendation-heading">官网阵容推荐 <span id="catalog-count" class="count"></span></h2><p id="catalog-status" role="status">正在读取阵容…</p></div><button class="text-button" id="refresh-catalog">刷新阵容 ↻</button></div>
