@@ -9,10 +9,12 @@ permalink: /jcc/
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#11191b">
-  <meta name="description" content="记录金铲铲阵容、棋子站位、装备和运营思路，生成链接分享给好友。">
+  <meta name="description" content="自动读取金铲铲官网阵容攻略，查看棋子、装备与站位，分享给好友。">
   <title>金铲铲阵容分享 · Uhack</title>
-  <link rel="stylesheet" href="{{ '/css/jcc.css' | prepend: site.baseurl }}">
-  <script src="{{ '/js/jcc.js' | prepend: site.baseurl }}" defer></script>
+  <link rel="stylesheet" href="{{ '/css/jcc.css?v=2' | prepend: site.baseurl }}">
+  <script src="{{ '/js/jcc.js?v=2' | prepend: site.baseurl }}" defer></script>
+  <script src="{{ '/js/jcc-data.js' | prepend: site.baseurl }}" defer></script>
+  <script src="{{ '/js/jcc-catalog.js' | prepend: site.baseurl }}" defer></script>
 </head>
 <body>
   <header class="topbar">
@@ -22,10 +24,19 @@ permalink: /jcc/
 
   <main class="shell">
     <section class="intro">
-      <div><p class="eyebrow"><span></span>TEAMFIGHT NOTES</p><h1>金铲铲<span>阵容分享</span></h1><p class="intro-copy">排好站位，记下思路，分享给队友。</p></div>
-      <button class="button primary" id="new-lineup"><span aria-hidden="true">＋</span> 新建阵容</button>
+      <div><p class="eyebrow"><span></span>TEAMFIGHT TACTICS</p><h1>金铲铲<span>今天玩什么？</span></h1><p class="intro-copy">阵容、装备、站位，打开就能看。</p></div>
+      <button class="button secondary" id="toggle-editor" aria-expanded="false">我的阵容 / 编辑</button>
     </section>
 
+    <section id="recommendations" aria-labelledby="recommendation-heading">
+      <div class="patch-note"><div><strong>自然之力</strong><span>10 月 22 日 · 18.5 更新</span><p>崔丝塔娜、墨菲特增强，拉露恩调整。攻略版本见各阵容卡片。</p></div><a href="https://www.taptap.cn/moment/862042074755629446" target="_blank" rel="noopener">官方更新公告 ↗</a></div>
+      <div class="catalog-heading"><div><h2 id="recommendation-heading">官网阵容推荐 <span id="catalog-count" class="count"></span></h2><p id="catalog-status" role="status">正在读取阵容…</p></div><button class="text-button" id="refresh-catalog">刷新阵容 ↻</button></div>
+      <div class="catalog-toolbar"><label><span class="sr-only">搜索推荐阵容</span><input type="search" id="catalog-search" placeholder="搜阵容、英雄或羁绊…"></label><div class="catalog-filters" aria-label="阵容筛选"><button class="filter active" data-filter="all" aria-pressed="true">全部</button><button class="filter" data-filter="S" aria-pressed="false">S 级攻略</button><button class="filter" data-filter="reroll" aria-pressed="false">追三星</button></div></div>
+      <p class="catalog-disclaimer">S / A 为官网攻略评级；不是实时胜率榜。每次打开会同步官网，失败时保留已收录阵容。</p>
+      <div id="catalog-grid" class="catalog-grid"></div><button class="button secondary more-button" id="more-comps" hidden>加载更多阵容</button>
+      <p class="catalog-credit">阵容与图片来自 <a href="https://jcc.qq.com/#/lineup" target="_blank" rel="noopener">金铲铲之战官网 ↗</a></p>
+    </section>
+    <section id="editor-section" hidden><div class="editor-heading"><h2>我的阵容</h2><button class="button secondary" id="new-lineup">＋ 新建阵容</button></div>
     <div id="notice" class="notice" role="status" hidden></div>
     <div class="workspace">
       <aside class="collection panel" aria-labelledby="collection-heading">
@@ -68,9 +79,11 @@ permalink: /jcc/
         </section>
       </section>
     </div>
+    </section>
     <footer class="page-footer"><span>Uhack · 金铲铲阵容笔记</span><span>玩家自制工具，与游戏官方无关联</span></footer>
   </main>
 
+  <dialog id="comp-dialog" aria-labelledby="comp-title"><div class="dialog-heading"><div><p id="comp-meta" class="eyebrow"></p><h2 id="comp-title"></h2></div><button class="icon-button" data-close="comp-dialog" aria-label="关闭阵容详情">×</button></div><p id="comp-traits" class="dialog-copy"></p><div class="enemy-line"><span></span>对手方向<span></span></div><div id="comp-board" class="comp-board" aria-label="推荐站位"></div><p class="catalog-disclaimer">站位与装备按官网攻略展示，未显示小精灵等召唤单位。请结合对手站位调整。</p><h3 class="equip-title">装备分配</h3><div id="comp-equipment"></div><div class="dialog-actions"><button class="button primary" id="share-recommendation">分享这套阵容 ↗</button><button class="button secondary" id="edit-recommendation">调整 / 收藏</button><a class="button secondary" href="https://jcc.qq.com/#/lineup" target="_blank" rel="noopener">完整官网攻略 ↗</a></div></dialog>
   <dialog id="share-dialog" aria-labelledby="share-heading">
     <div class="dialog-heading"><div><p class="eyebrow">SHARE YOUR LINEUP</p><h2 id="share-heading">把阵容发给队友</h2></div><button class="icon-button" data-close="share-dialog" aria-label="关闭分享窗口">×</button></div>
     <p class="dialog-copy">对方打开链接，就能看到棋子、站位、装备和笔记。</p>
@@ -81,6 +94,6 @@ permalink: /jcc/
 
   <dialog id="confirm-dialog" aria-labelledby="confirm-heading"><div class="dialog-heading"><h2 id="confirm-heading">确认操作</h2><button class="icon-button" data-close="confirm-dialog" aria-label="取消操作">×</button></div><p id="confirm-copy"></p><div class="dialog-actions"><button class="button primary" id="confirm-action">确定</button><button class="button secondary" data-close="confirm-dialog">取消</button></div></dialog>
   <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
-  <noscript><p class="noscript">请启用 JavaScript，才能编辑和分享阵容。</p></noscript>
+  <noscript><p class="noscript">请启用 JavaScript 查看推荐，或前往金铲铲官网查看阵容攻略。</p></noscript>
 </body>
 </html>

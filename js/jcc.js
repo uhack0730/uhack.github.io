@@ -313,6 +313,8 @@
   function readHash() {
     if (!location.hash.startsWith('#lineup=')) return false;
     try {
+      $('editor-section').hidden = false;
+      $('toggle-editor').setAttribute('aria-expanded', 'true');
       loadLineup(decode(location.hash.slice(8)));
       notice('正在查看分享的阵容。可以直接调整，或点击「保存到本机」收藏。');
     } catch (error) { notice(error.message); }
@@ -414,6 +416,24 @@
   });
   window.addEventListener('hashchange', () => {
     if (location.hash.startsWith('#lineup=')) replaceDraft(readHash);
+  });
+  window.addEventListener('jcc-recommendation', event => {
+    if (event.detail.share) {
+      shareSnapshot = normalize(event.detail.lineup);
+      $('share-url').value = location.origin + location.pathname + '#lineup=' + encode(shareSnapshot);
+      $('native-share').hidden = !(navigator.share && window.isSecureContext);
+      $('share-dialog').showModal();
+    } else replaceDraft(() => {
+      loadLineup(event.detail.lineup);
+      $('editor-section').hidden = false;
+      $('toggle-editor').setAttribute('aria-expanded', 'true');
+      $('editor-section').scrollIntoView({behavior:'smooth'});
+    });
+  });
+  $('toggle-editor').addEventListener('click', () => {
+    $('editor-section').hidden = !$('editor-section').hidden;
+    $('toggle-editor').setAttribute('aria-expanded', String(!$('editor-section').hidden));
+    if (!$('editor-section').hidden) $('editor-section').scrollIntoView({behavior:'smooth'});
   });
   window.addEventListener('pagehide', rememberDraft);
 })();
