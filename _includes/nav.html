@@ -19,7 +19,7 @@
                     <li>
                         <a href="{{ site.baseurl }}/">Home</a>
                     </li>
-                    {% for page in site.pages %}{% if page.title and page.homepage != true %}
+                    {% for page in site.pages %}{% if page.title and page.homepage != true and page.name != 'tags.html' %}
                     <li>
                         <a href="{{ page.url | prepend: site.baseurl }}">{{ page.title }}</a>
                     </li>
