@@ -1,39 +1,11 @@
 ---
 layout: page
 title: "About"
-description: "我是 Uhack，关注 AI 编译器、异构计算与大模型推理。"
+description: "AI 编译器 · 算子优化 · 大模型推理"
 header-img: "img/post-bg-rwd.jpg"
 ---
 
-<div class="zh post-container" lang="zh-CN">
-    <blockquote>
-        <p>从模型到算子，从编译到硬件。<br>
-        记录问题，也记录把问题弄明白的过程。</p>
-    </blockquote>
-
-    <h2>关于我</h2>
-    <p>你好，我是 <strong>Uhack</strong>。目前主要从事 AI 软件栈相关开发，围绕 <strong>PyTorch 自定义硬件后端、编译器适配、算子实现与大模型推理</strong>开展工作。</p>
-    <p>我关心一个模型如何从 Python 代码变成硬件上实际执行的计算：张量如何组织，算子如何切分，数据如何搬运，以及编译、运行时和硬件之间如何配合。日常工作既包括模型适配与正确性排查，也包括计算、内存和通信开销的分析与优化。</p>
-
-    <h2>我在做什么</h2>
-    <ul>
-        <li><strong>PyTorch 后端与编译适配：</strong>围绕 PrivateUse1 自定义设备接入，处理算子执行、内存管理和运行时衔接，关注 TorchInductor 与 Triton 编译路径中的图变换和代码生成。</li>
-        <li><strong>算子与内存优化：</strong>研究矩阵乘、卷积、归一化和 Attention 等算子的实现，结合硬件特性处理张量布局、分块计算与片上内存规划。</li>
-        <li><strong>分布式执行与通信：</strong>关注多卡及芯片内部多计算单元之间的张量切分、布局传播和集合通信，分析计算与数据传输之间的关系。</li>
-        <li><strong>大模型推理：</strong>围绕 vLLM、KV Cache、MoE 和专家并行持续学习与实践，理解模型结构、路由机制和推理性能瓶颈。</li>
-    </ul>
-
-    <h2>我如何学习和解决问题</h2>
-    <p>遇到问题时，我习惯先把张量的 shape、数据布局和执行路径列清楚，再用小例子或最小复现验证理解。从一个算子的数值差异，到一段编译图的变化，再到多卡之间的数据流，我希望既能把代码跑通，也能解释它为什么这样运行。</p>
-    <p>常用的技术与工具包括 <strong>Python、C++、PyTorch、TorchInductor、Triton、Linux、Docker 和 Git</strong>。我也持续关注软硬件协同设计，希望把对模型、编译器和硬件的理解连接起来。</p>
-
-    <h2>关于这个博客</h2>
-    <p>这里用来整理开发过程中的技术笔记、源码阅读、实验结果和问题排查记录，主要涉及 AI 编译器、算子优化、分布式计算与大模型推理，也会记录日常开发环境中的实用经验。</p>
-    <p>写下来，是为了把零散的经验变成可以回看、验证和复用的知识。文章中的理解会随着实践不断修正，也欢迎交流不同的思路。</p>
-
-    <h2>找到我</h2>
-    <p>GitHub：<a href="https://github.com/uhack0730">@uhack0730</a></p>
-</div>
+{% include tech-stack.html %}
 
 <!-- Gitalk 评论 start  -->
 {% if site.gitalk.enable %}
