@@ -12,13 +12,37 @@ permalink: /jcc/
   <meta name="description" content="自动读取金铲铲官网阵容攻略，查看棋子、装备与站位，分享给好友。">
   <title>金铲铲阵容分享 · Uhack</title>
   <link rel="stylesheet" href="{{ '/css/jcc.css?v=artifacts1' | prepend: site.baseurl }}">
-  <script src="{{ '/js/jcc.js?v=2' | prepend: site.baseurl }}" defer></script>
-  <script src="{{ '/js/jcc-data.js' | prepend: site.baseurl }}" defer></script>
-  <script src="{{ '/js/jcc-artifact-data.js' | prepend: site.baseurl }}" defer></script>
-  <script src="{{ '/js/jcc-artifacts.js' | prepend: site.baseurl }}" defer></script>
-  <script src="{{ '/js/jcc-catalog.js?v=artifacts1' | prepend: site.baseurl }}" defer></script>
+  <style>
+    #jcc-content[hidden], #access-gate[hidden] { display: none !important; }
+    .access-gate { min-height: 100vh; min-height: 100dvh; display: grid; place-items: center; padding: 24px; }
+    .access-card { width: min(100%, 420px); padding: 36px 28px; border: 1px solid #334340; border-radius: 24px; background: #182322; box-shadow: 0 24px 80px #0003; }
+    .access-card h1 { font-size: 28px; margin: 20px 0 12px; }
+    .access-card p { color: #a9b9b3; line-height: 1.7; }
+    .access-card .field { margin-top: 28px; }
+    .access-card input { width: 100%; font-size: 16px; }
+    .access-card .button { width: 100%; margin-top: 8px; }
+    .access-card .access-error { min-height: 24px; color: #f4b4a5; font-size: 14px; margin: 12px 0; }
+    .access-home { display: inline-block; margin-top: 20px; color: #a9b9b3; font-size: 14px; }
+  </style>
 </head>
 <body>
+  <section id="access-gate" class="access-gate" aria-labelledby="access-title">
+    <div class="access-card">
+      <span class="brand-mark" aria-hidden="true">U</span>
+      <h1 id="access-title">金铲铲阵容分享</h1>
+      <p>输入访问密码，查看阵容与神器搭配。</p>
+      <form id="access-form">
+        <label class="field" for="access-password">访问密码
+          <input id="access-password" type="password" autocomplete="off" placeholder="请输入密码" required maxlength="128" aria-describedby="access-error" autofocus>
+        </label>
+        <p id="access-error" class="access-error" role="status" aria-live="polite"></p>
+        <button id="access-submit" class="button primary" type="submit">进入阵容页</button>
+      </form>
+      <a class="access-home" href="{{ site.baseurl }}/">← 返回主页</a>
+      <noscript><p>请启用 JavaScript 后输入密码。</p></noscript>
+    </div>
+  </section>
+  <div id="jcc-content" hidden inert>
   <header class="topbar">
     <a class="brand" href="{{ site.baseurl }}/"><span class="brand-mark" aria-hidden="true">U</span>Uhack<span class="brand-divider">/</span><span class="brand-section">阵容分享</span></a>
     <nav aria-label="网站导航"><a href="{{ site.baseurl }}/">主页</a><a href="{{ site.baseurl }}/about/">About</a><a class="active" aria-current="page" href="{{ site.baseurl }}/jcc/">阵容分享</a></nav>
@@ -112,6 +136,74 @@ permalink: /jcc/
 
   <dialog id="confirm-dialog" aria-labelledby="confirm-heading"><div class="dialog-heading"><h2 id="confirm-heading">确认操作</h2><button class="icon-button" data-close="confirm-dialog" aria-label="取消操作">×</button></div><p id="confirm-copy"></p><div class="dialog-actions"><button class="button primary" id="confirm-action">确定</button><button class="button secondary" data-close="confirm-dialog">取消</button></div></dialog>
   <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
-  <noscript><p class="noscript">请启用 JavaScript 查看推荐，或前往金铲铲官网查看阵容攻略。</p></noscript>
+
+  </div>
+  <script>
+    (() => {
+      'use strict';
+      // Base64 is reversible encoding, not encryption or server-side authentication.
+      const passwordBase64 = 'dWhhY2tfeWFuZw==';
+      const sources = ["{{ '/js/jcc.js?v=2' | prepend: site.baseurl }}","{{ '/js/jcc-data.js' | prepend: site.baseurl }}","{{ '/js/jcc-artifact-data.js' | prepend: site.baseurl }}","{{ '/js/jcc-artifacts.js' | prepend: site.baseurl }}","{{ '/js/jcc-catalog.js?v=artifacts1' | prepend: site.baseurl }}"];
+      const form = document.getElementById('access-form');
+      const password = document.getElementById('access-password');
+      const button = document.getElementById('access-submit');
+      const feedback = document.getElementById('access-error');
+      let loading = false;
+      let loadedCount = 0;
+      function loadScript(src) {
+        return new Promise((resolve, reject) => {
+          const script = document.createElement('script');
+          script.src = src;
+          script.onload = resolve;
+          script.onerror = () => { script.remove(); reject(new Error('Script unavailable')); };
+          document.head.appendChild(script);
+        });
+      }
+      password.addEventListener('input', () => {
+        password.removeAttribute('aria-invalid');
+        feedback.textContent = '';
+      });
+      form.addEventListener('submit', async event => {
+        event.preventDefault();
+        if (loading) return;
+        if (password.value !== atob(passwordBase64)) {
+          feedback.textContent = '密码不正确，请重新输入。';
+          password.setAttribute('aria-invalid', 'true');
+          password.focus();
+          password.select();
+          return;
+        }
+        loading = true;
+        button.disabled = true;
+        button.textContent = '正在加载…';
+        feedback.textContent = '';
+        try {
+          // Preserve script order and initialize the existing app only after unlocking.
+          while (loadedCount < sources.length) {
+            await loadScript(sources[loadedCount]);
+            loadedCount++;
+          }
+          password.value = '';
+          document.getElementById('access-gate').hidden = true;
+          const content = document.getElementById('jcc-content');
+          content.hidden = false;
+          content.inert = false;
+          const heading = content.querySelector('h1');
+          heading.tabIndex = -1;
+          heading.focus({ preventScroll: true });
+        } catch (_) {
+          feedback.textContent = '页面加载失败，请检查网络后重试。';
+        } finally {
+          loading = false;
+          button.disabled = false;
+          button.textContent = '进入阵容页';
+        }
+      });
+      // Returning via the browser back/forward cache also requires the password again.
+      window.addEventListener('pageshow', event => {
+        if (event.persisted) window.location.reload();
+      });
+    })();
+  </script>
 </body>
 </html>
