@@ -1,0 +1,86 @@
+---
+layout: null
+title: "阵容分享"
+permalink: /jcc/
+---
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#11191b">
+  <meta name="description" content="记录金铲铲阵容、棋子站位、装备和运营思路，生成链接分享给好友。">
+  <title>金铲铲阵容分享 · Uhack</title>
+  <link rel="stylesheet" href="{{ '/css/jcc.css' | prepend: site.baseurl }}">
+  <script src="{{ '/js/jcc.js' | prepend: site.baseurl }}" defer></script>
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="{{ site.baseurl }}/"><span class="brand-mark" aria-hidden="true">U</span>Uhack<span class="brand-divider">/</span><span class="brand-section">阵容分享</span></a>
+    <nav aria-label="网站导航"><a href="{{ site.baseurl }}/">主页</a><a href="{{ site.baseurl }}/about/">About</a><a class="active" aria-current="page" href="{{ site.baseurl }}/jcc/">阵容分享</a></nav>
+  </header>
+
+  <main class="shell">
+    <section class="intro">
+      <div><p class="eyebrow"><span></span>TEAMFIGHT NOTES</p><h1>金铲铲<span>阵容分享</span></h1><p class="intro-copy">排好站位，记下思路，分享给队友。</p></div>
+      <button class="button primary" id="new-lineup"><span aria-hidden="true">＋</span> 新建阵容</button>
+    </section>
+
+    <div id="notice" class="notice" role="status" hidden></div>
+    <div class="workspace">
+      <aside class="collection panel" aria-labelledby="collection-heading">
+        <div class="section-heading"><h2 id="collection-heading">本机阵容</h2><span id="saved-count" class="count">0</span></div>
+        <label class="search-label"><span class="sr-only">搜索收藏的阵容</span><input id="search" type="search" placeholder="搜索阵容、棋子…" autocomplete="off"></label>
+        <div id="saved-list" class="saved-list"></div>
+        <div class="storage-note"><span aria-hidden="true">◈</span><p>收藏仅保存在当前浏览器。<br>发给朋友，请使用分享链接。</p></div>
+      </aside>
+
+      <section class="editor" aria-label="阵容编辑器">
+        <div class="editor-top panel">
+          <div class="title-fields"><label class="sr-only" for="lineup-title">阵容名称</label><input id="lineup-title" maxlength="40" placeholder="给阵容起个名字" autocomplete="off"><div class="meta-row"><label for="season">赛季 / 版本</label><input id="season" maxlength="24" placeholder="手动填写" autocomplete="off"><span class="draft-badge" id="draft-status">草稿</span></div></div>
+          <div class="actions"><button class="button secondary" id="save-lineup">保存到本机</button><button class="button primary" id="share-lineup">分享阵容 <span aria-hidden="true">↗</span></button></div>
+        </div>
+
+        <div class="battle-layout">
+          <section class="board-panel panel" aria-labelledby="board-heading">
+            <div class="section-heading"><h2 id="board-heading">棋子站位</h2><span class="unit-count"><strong id="unit-count">0</strong> / 28 格</span></div>
+            <div class="enemy-line"><span></span>对手方向<span></span></div>
+            <div id="board" class="board" role="group" aria-label="四排七列站位棋盘"></div>
+            <div class="board-legend"><span><i class="dot carry"></i>主 C</span><span><i class="dot tank"></i>主坦</span><span><i class="dot support"></i>辅助</span><span class="backline">己方后排</span></div>
+            <p class="board-tip" id="board-tip">点击格子编辑棋子。选中已有棋子，可以移动或交换站位。</p>
+          </section>
+
+          <section class="unit-panel panel" aria-labelledby="unit-heading">
+            <div class="section-heading"><h2 id="unit-heading">棋子设置</h2><span class="position-badge" id="position-label">1 排 · 1 列</span></div>
+            <label class="field">棋子名称<input id="unit-name" maxlength="20" placeholder="输入棋子名称" autocomplete="off"></label>
+            <div class="field-row"><label class="field">费用<select id="unit-cost"><option value="1">1 费</option><option value="2">2 费</option><option value="3">3 费</option><option value="4">4 费</option><option value="5">5 费</option></select></label><label class="field">星级<select id="unit-stars"><option value="1">★</option><option value="2">★★</option><option value="3">★★★</option></select></label></div>
+            <label class="field">定位<select id="unit-role"><option value="">普通棋子</option><option value="carry">主 C</option><option value="tank">主坦</option><option value="support">辅助</option></select></label>
+            <fieldset class="equipment"><legend>装备 <span>最多 3 件</span></legend><input id="item-0" aria-label="第一件装备" maxlength="24" placeholder="装备 1" autocomplete="off"><input id="item-1" aria-label="第二件装备" maxlength="24" placeholder="装备 2" autocomplete="off"><input id="item-2" aria-label="第三件装备" maxlength="24" placeholder="装备 3" autocomplete="off"></fieldset>
+            <div class="unit-actions"><button class="button secondary" id="move-unit" disabled>移动棋子</button><button class="text-button danger" id="clear-unit" disabled>移除</button></div>
+          </section>
+        </div>
+
+        <section class="notes-panel panel" aria-labelledby="notes-heading">
+          <div class="section-heading"><h2 id="notes-heading">阵容笔记</h2><span class="muted">随分享链接一起保存</span></div>
+          <div class="notes-grid"><label class="field">核心羁绊<input id="traits" maxlength="120" placeholder="例如：填写羁绊名称与数量"></label><label class="field">强化符文<input id="augments" maxlength="120" placeholder="优先选择 / 可用替代"></label></div>
+          <label class="field">运营思路<textarea id="notes" maxlength="1200" rows="5" placeholder="什么时候升级、什么时候搜牌？装备怎么分配？哪些棋子可以替换？"></textarea></label>
+          <details class="game-code"><summary>游戏内阵容码 <span>可选</span></summary><label class="field"><span class="sr-only">游戏内阵容码</span><textarea id="game-code" maxlength="2000" rows="3" placeholder="粘贴从金铲铲游戏中复制的阵容码"></textarea></label><div class="code-bottom"><p>原样保存已有阵容码；网页站位不会自动转换为游戏导入码。</p><button class="button secondary small" id="copy-game-code">复制阵容码</button></div></details>
+        </section>
+      </section>
+    </div>
+    <footer class="page-footer"><span>Uhack · 金铲铲阵容笔记</span><span>玩家自制工具，与游戏官方无关联</span></footer>
+  </main>
+
+  <dialog id="share-dialog" aria-labelledby="share-heading">
+    <div class="dialog-heading"><div><p class="eyebrow">SHARE YOUR LINEUP</p><h2 id="share-heading">把阵容发给队友</h2></div><button class="icon-button" data-close="share-dialog" aria-label="关闭分享窗口">×</button></div>
+    <p class="dialog-copy">对方打开链接，就能看到棋子、站位、装备和笔记。</p>
+    <label class="field">分享链接<textarea id="share-url" rows="3" readonly></textarea></label>
+    <div class="dialog-actions"><button class="button primary" id="copy-link">复制链接</button><button class="button secondary" id="copy-text">复制阵容文字</button><button class="button secondary" id="native-share" hidden>系统分享</button></div>
+    <p class="dialog-footnote">链接保留生成时的阵容；修改后请重新生成。</p>
+  </dialog>
+
+  <dialog id="confirm-dialog" aria-labelledby="confirm-heading"><div class="dialog-heading"><h2 id="confirm-heading">确认操作</h2><button class="icon-button" data-close="confirm-dialog" aria-label="取消操作">×</button></div><p id="confirm-copy"></p><div class="dialog-actions"><button class="button primary" id="confirm-action">确定</button><button class="button secondary" data-close="confirm-dialog">取消</button></div></dialog>
+  <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+  <noscript><p class="noscript">请启用 JavaScript，才能编辑和分享阵容。</p></noscript>
+</body>
+</html>
